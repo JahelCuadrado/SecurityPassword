@@ -14,16 +14,12 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 #Claves secretas
 SECRET_KEY1 = ""
-
 SECRET_KEY2 = ""
-
 SECRET_KEY3 = ""
 
 #Seeds secretas
 SEED_KEY1 = ""
-
 SEED_KEY2 = ""
-
 SEED_KEY3 = ""
 
 #Cifrado
@@ -42,7 +38,6 @@ key = base64.urlsafe_b64encode(kdf.derive(password_encrypt.encode()))
 
 # Creamos un objeto Fernet con la clave generada
 f = Fernet(key)
-
 
 # Abrimos un archivo shelve llamado 'secret.db' en modo lectura/escritura
 with shelve.open('secret.db', flag='c') as db:
@@ -105,8 +100,15 @@ code = input("Ingrese su código de Google Authenticator: ")
 # Verificamos que el código OTP proporcionado sea válido
 if totp.verify(code):
     
-    #Borramos el código QR
-    os.remove("codigo_qr.png")
+    # Abrimos de nuevo el archivo shelve en modo lectura
+    with shelve.open('secret.db', flag='c') as db:
+    
+        #Borramos el código QR
+        valor = db['qr']
+        if valor == True:
+            os.remove("codigo_qr.png")
+            db['qr'] = False
+            
     
     # Si el código OTP es válido, generamos una contraseña aleatoria a partir de la semilla
     def generate_password(seed):
